@@ -1,68 +1,86 @@
-services:
-  # Веб-сервер с PHP 8.2 и предустановленными расширениями для Yii2
-  web:
-    image: yiisoftware/yii2-php:8.2-apache
-    container_name: yii2_web
-    volumes:
-      - .:/app
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    networks:
-      - yii2-network
-    environment:
-      # Настройки для Yii2
-      YII_ENV: dev
-      YII_DEBUG: "true"
-    # Настройка Apache для Yii2
-    entrypoint: ["sh", "-c"]
-    command: >
-      "
-      a2enmod rewrite
-      && echo '<Directory /app>' > /etc/apache2/conf-available/yii2.conf
-      && echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/yii2.conf
-      && echo '    AllowOverride All' >> /etc/apache2/conf-available/yii2.conf
-      && echo '    Require all granted' >> /etc/apache2/conf-available/yii2.conf
-      && echo '</Directory>' >> /etc/apache2/conf-available/yii2.conf
-      && a2enconf yii2.conf
-      && apache2-foreground
-      "
-
-  # База данных MySQL 5.7
-  db:
-    image: mysql:5.7
-    container_name: yii2_db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: yii_basa
-      MYSQL_USER: user
-      MYSQL_PASSWORD: secret
-    volumes:
-      - mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - yii2-network
-
-  # phpMyAdmin
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: yii2_phpmyadmin
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 1
-    ports:
-      - "8081:80"
-    depends_on:
-      - db
-    networks:
-      - yii2-network
-
-volumes:
-  mysql_data:
-
-networks:
-  yii2-network:
-    driver: bridge
+{
+  "name": "yiisoft/yii2-app-basic",
+  "description": "Yii 2 Basic Project Template",
+  "keywords": ["yii2", "framework", "basic", "project template"],
+  "homepage": "https://www.yiiframework.com/",
+  "type": "project",
+  "license": "BSD-3-Clause",
+  "support": {
+    "issues": "https://github.com/yiisoft/yii2/issues?state=open",
+    "forum": "https://www.yiiframework.com/forum/",
+    "wiki": "https://www.yiiframework.com/wiki/",
+    "irc": "ircs://irc.libera.chat:6697/yii",
+    "source": "https://github.com/yiisoft/yii2"
+  },
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.4.0",
+    "yiisoft/yii2": "^2.0.52",
+    "yiisoft/yii2-bootstrap4": "^2.0.12",
+    "yiisoft/yii2-symfonymailer": "^2.0.4",
+    "2amigos/yii2-ckeditor-widget": "^2.1.0",
+    "kartik-v/yii2-grid": "^3.5.3",
+    "kartik-v/yii2-date-range": "dev-master",
+    "kartik-v/yii2-widget-datepicker": "dev-master",
+    "ckeditor/ckeditor": "^4.7.3",
+    "guzzlehttp/guzzle": "^7.9.3",
+    "egulias/email-validator": "^4.0.4",
+    "ezyang/htmlpurifier": "^4.18.0",
+    "cebe/markdown": "^1.2.1",
+    "mihaildev/yii2-ckeditor": "*",
+    "kartik-v/yii2-markdown": "*"
+  },
+  "require-dev": {
+    "yiisoft/yii2-debug": "~2.1.0",
+    "yiisoft/yii2-gii": "~2.2.0",
+    "yiisoft/yii2-faker": "~2.0.0",
+    "codeception/codeception": "^5.0.0 || ^4.0",
+    "codeception/lib-innerbrowser": "^4.0 || ^3.0 || ^1.1",
+    "codeception/module-asserts": "^3.0 || ^1.1",
+    "codeception/module-yii2": "^1.1",
+    "codeception/module-filesystem": "^3.0 || ^2.0 || ^1.1",
+    "codeception/verify": "^3.0 || ^2.2",
+    "fakerphp/faker": "^1.24.1",
+    "phpunit/phpunit": "^10.5.45"
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer" : true
+    },
+    "process-timeout": 1800,
+    "fxp-asset": {
+      "enabled": false
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "yii\\composer\\Installer::postInstall"
+    ],
+    "post-create-project-cmd": [
+      "yii\\composer\\Installer::postCreateProject",
+      "yii\\composer\\Installer::postInstall"
+    ]
+  },
+  "extra": {
+    "yii\\composer\\Installer::postCreateProject": {
+      "setPermission": [
+        {
+          "runtime": "0777",
+          "web/assets": "0777",
+          "yii": "0755"
+        }
+      ]
+    },
+    "yii\\composer\\Installer::postInstall": {
+      "generateCookieValidationKey": [
+        "config/web.php"
+      ]
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
+}

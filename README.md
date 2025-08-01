@@ -1,7 +1,6 @@
 # Порядок установки проекта
 
 * Запуск Docker `` docker compose up -d ``
-* Запуск зависимостей `` docker-compose run --rm composer install --ignore-platform-reqs ``- это только с этим docker-compose.yml
 * Переход в контейнер  `` docker-compose exec -it web bash ``
 * Запуск установки расширений yii2 `` composer install ``
 * Очистка кеш `` composer clear-cache ``
